@@ -1,0 +1,36 @@
+<a href="/link">link</a>
+<a href="/logout">logout</a>
+
+<ul class="profiles">
+{{ range .Accounts }}
+  <li data-id="{{ .Id }}" data-remote-id="{{ .RemoteId }}">
+    <div class="picture provider" style="background: {{ .Provider.IconColor }}"><i class="fa {{ .Provider.IconName }}"></i></div>
+    <div class="picture account"><img src="{{ .Picture }}"></div>
+    <div class="name">{{ .Name }}</div>
+  </li>
+{{ end }}
+</ul>
+
+
+<div class="owned-applications">
+
+  {{ range .OwnedApplications }}
+  <dl data-id="{{ .Id }}">
+    <dt>Name</dt>
+    <dd>{{ .Name }}</dd>
+    <dt>Client ID</dt>
+    <dd class="pre">{{ .ClientId }}</dd>
+    <dt>Client secret</dt>
+    <dd class="pre">{{ .ClientSecret }}</dd>
+    <dt>Redirect URI</dt>
+    <dd class="pre">{{ .RedirectURI }}</dd>
+  </dl>
+  {{ end }}
+
+  <form action="/applications" method="post">
+    <input type="text" name="application[name]" placeholder="Name"/>
+    <input type="text" name="application[redirect_uri]" placeholder="Redirect URI" />
+    <input type="submit" />
+  </form>
+
+</div>
