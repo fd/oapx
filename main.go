@@ -4,7 +4,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/codegangsta/martini"
+	"github.com/go-martini/martini"
 	"github.com/jmoiron/sqlx"
 	"github.com/martini-contrib/render"
 	"github.com/martini-contrib/sessions"

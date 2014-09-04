@@ -11,7 +11,7 @@ import (
 
 	"code.google.com/p/goauth2/oauth"
 	"github.com/RangelReale/osin"
-	"github.com/codegangsta/martini"
+	"github.com/go-martini/martini"
 	"github.com/jmoiron/sqlx"
 	"github.com/martini-contrib/render"
 	"github.com/martini-contrib/sessions"
@@ -189,7 +189,7 @@ func GET_callback(c martini.Context, sess sessions.Session, r *http.Request, db 
 		transport = provider.Transport(nil)
 	)
 
-	token, err := transport.Exchange(r.URL.Query().Get("code"))
+	token, err := provider.Exchange(transport, r.URL.Query().Get("code"))
 	if err != nil {
 		panic(err)
 	}
@@ -468,6 +468,8 @@ func tmp_new_provider(typ string) *providers.Provider {
 		p, err = providers.New(typ, "75d06562f297cf2cc0a5", "00e3c788d083c12678a29bf87e0d374c6a1d5bc2")
 	case "fb":
 		p, err = providers.New(typ, "303274556491300", "4bdf767541d8fab54f149ebceb0b114c")
+	case "hk":
+		p, err = providers.New(typ, "1bc9938a-01cc-42f6-ace7-e61d396895b7", "d2753b61-b64a-40a7-a5cf-ee9e6954450b")
 	default:
 		p, err = providers.New(typ, "", "")
 	}

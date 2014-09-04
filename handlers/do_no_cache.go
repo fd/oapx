@@ -3,7 +3,7 @@ package handlers
 import (
 	"net/http"
 
-	"github.com/codegangsta/martini"
+	"github.com/go-martini/martini"
 )
 
 func NoCache() martini.Handler {

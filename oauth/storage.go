@@ -15,7 +15,7 @@ type Storage struct {
 }
 
 // GetClient loads the client by id (client_id)
-func (s *Storage) GetClient(client_id string) (*osin.Client, error) {
+func (s *Storage) GetClient(client_id string) (osin.Client, error) {
 	application, err := data.GetApplicationWithClientId(s.db, client_id)
 	if err != nil {
 		return nil, err
@@ -25,7 +25,7 @@ func (s *Storage) GetClient(client_id string) (*osin.Client, error) {
 		return nil, fmt.Errorf("no such application")
 	}
 
-	client := &osin.Client{
+	client := &osin.DefaultClient{
 		Id:          application.ClientId,
 		Secret:      application.ClientSecret,
 		RedirectUri: application.RedirectURI,
@@ -35,7 +35,7 @@ func (s *Storage) GetClient(client_id string) (*osin.Client, error) {
 	return client, nil
 }
 
-func (s *Storage) getClientWithId(id int64) (*osin.Client, error) {
+func (s *Storage) getClientWithId(id int64) (osin.Client, error) {
 	application, err := data.GetApplicationWithId(s.db, id)
 	if err != nil {
 		return nil, err
@@ -45,7 +45,7 @@ func (s *Storage) getClientWithId(id int64) (*osin.Client, error) {
 		return nil, fmt.Errorf("no such application")
 	}
 
-	client := &osin.Client{
+	client := &osin.DefaultClient{
 		Id:          application.ClientId,
 		Secret:      application.ClientSecret,
 		RedirectUri: application.RedirectURI,
@@ -57,7 +57,7 @@ func (s *Storage) getClientWithId(id int64) (*osin.Client, error) {
 
 // SaveAuthorize saves authorize data.
 func (s *Storage) SaveAuthorize(ad *osin.AuthorizeData) error {
-	application := ad.Client.UserData.(*data.Application)
+	application := ad.Client.GetUserData().(*data.Application)
 
 	identity := ad.UserData.(*data.Identity)
 
@@ -114,7 +114,7 @@ func (s *Storage) RemoveAuthorize(code string) error {
 // SaveAccess writes AccessData.
 // If RefreshToken is not blank, it must save in a way that can be loaded using LoadRefresh.
 func (s *Storage) SaveAccess(ad *osin.AccessData) error {
-	application := ad.Client.UserData.(*data.Application)
+	application := ad.Client.GetUserData().(*data.Application)
 
 	authorization := ad.AuthorizeData.UserData.(*data.Authorization)
 
@@ -203,4 +203,11 @@ func (s *Storage) LoadRefresh(token string) (*osin.AccessData, error) {
 // RemoveRefresh revokes or deletes refresh AccessData.
 func (s *Storage) RemoveRefresh(token string) error {
 	return data.DestroyAccessTokenWithRefreshToken(s.db, token)
+}
+
+func (s *Storage) Clone() osin.Storage {
+	return s
+}
+
+func (s *Storage) Close() {
 }

@@ -15,9 +15,12 @@ type Provider struct {
 	TokenURL         string
 	Scopes           []string
 	get_profile_func providerProfileFetcher
+	exchange_func    exchangeFunc
 	IconName         string
 	IconColor        string
 }
+
+type exchangeFunc func(transport *oauth.Transport, code string) (*oauth.Token, error)
 
 func New(typ, client_id, client_secret string) (*Provider, error) {
 	provider, ok := providers[typ]
@@ -32,14 +35,11 @@ func New(typ, client_id, client_secret string) (*Provider, error) {
 	return ptr, nil
 }
 
-func (p *Provider) GetProfile(transport *oauth.Transport) (Profile, error) {
-	return p.get_profile_func(transport)
-}
-
 var providers = map[string]Provider{
 	p_google.Code:   p_google,
 	p_github.Code:   p_github,
 	p_facebook.Code: p_facebook,
+	p_heroku.Code:   p_heroku,
 }
 
 func (p *Provider) Config() *oauth.Config {
@@ -58,4 +58,16 @@ func (p *Provider) Config() *oauth.Config {
 
 func (p *Provider) Transport(token *oauth.Token) *oauth.Transport {
 	return &oauth.Transport{Config: p.Config(), Token: token}
+}
+
+func (p *Provider) GetProfile(transport *oauth.Transport) (Profile, error) {
+	return p.get_profile_func(transport)
+}
+
+func (p *Provider) Exchange(transport *oauth.Transport, code string) (*oauth.Token, error) {
+	if p.exchange_func != nil {
+		return p.exchange_func(transport, code)
+	}
+
+	return transport.Exchange(code)
 }
